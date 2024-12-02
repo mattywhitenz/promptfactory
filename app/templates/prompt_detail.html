@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect(app)
+{% block title %}{{ prompt.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">{{ prompt.name }}</h2>
+                    <div>
+                        <span class="badge bg-secondary">v{{ prompt.version }}</span>
+                        {% if current_user.is_authenticated and (current_user.is_admin or prompt.created_by_id == current_user.id) %}
+                            <a href="{{ url_for('admin.edit_prompt', prompt_id=prompt.id) }}" 
+                               class="btn btn-primary btn-sm ms-2">Edit</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">{{ prompt.description }}</p>
+                    
+                    <!-- Stats Section -->
+                    <div class="stats-section d-flex align-items-center gap-4">
+                        <div class="stat-item">
+                            <i class="fas fa-eye"></i>
+                            <span class="stat-value" data-type="views">{{ stats.views }}</span>
+                            <span class="stat-label">Views</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-copy"></i>
+                            <span class="stat-value" data-type="copies">{{ stats.copies }}</span>
+                            <span class="stat-label">Copied</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span class="stat-value">{{ stats.likes }}</span>
+                            <span class="stat-label">Likes</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span class="stat-value">{{ stats.dislikes }}</span>
+                            <span class="stat-label">Dislikes</span>
+                        </div>
+                    </div>
+
+                    <!-- Like/Dislike Form -->
+                    <form id="feedbackForm" action="{{ url_for('main.rate_prompt', prompt_id=prompt.id) }}" method="POST" style="display: none;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" id="feedbackAction">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="comment">Comment (optional):</label>
+                                    <textarea class="form-control" name="comment" rows="3"></textarea>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideCommentForm()">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end mb-3">
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                        <a href="{{ url_for('admin.edit_prompt', prompt_id=prompt.id) }}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        {% endif %}
+                        <button class="btn btn-primary me-2" onclick="handleFeedback('like')">
+                            <i class="fas fa-thumbs-up"></i> Like
+                        </button>
+                        <button class="btn btn-primary me-2" onclick="handleFeedback('dislike')">
+                            <i class="fas fa-thumbs-down"></i> Dislike
+                        </button>
+                        <button class="btn btn-primary" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
+                    </div>
+
+                    <!-- Prompt Content -->
+                    <div class="prompt-content">
+                        <h5>Prompt Content</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <pre class="mb-0">{{ prompt.content }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>Created by {{ prompt.created_by.username if prompt.created_by else 'Unknown' }} 
+                           on {{ prompt.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <div class="mt-4">
+                <button class="btn btn-secondary" onclick="toggleComments()">Toggle Comments</button>
+                <div id="commentsSection" style="display: none;">
+                    <h3 class="text-success">Comments</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Comment</th>
+                                    <th>Version</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feedback in feedback_history %}
+                                <tr>
+                                    <td>{{ feedback.user.username if feedback.user else feedback.username }}</td>
+                                    <td>
+                                        <span class="badge {% if feedback.action_type == 'like' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ feedback.action_type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ feedback.comment }}</td>
+                                    <td>v{{ feedback.prompt_version }}</td>
+                                    <td>{{ feedback.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Track view
+    fetch(`/prompt/{{ prompt.id }}/view`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const viewCount = document.querySelector('[data-type="views"]');
+            if (viewCount) {
+                viewCount.textContent = data.count;
+            }
+        }
+    });
+});
+
+function copyToClipboard() {
+    const promptContent = document.querySelector('.prompt-content pre').textContent;
+    navigator.clipboard.writeText(promptContent).then(() => {
+        // Visual feedback first
+        const copyBtn = document.querySelector('.btn-primary[onclick="copyToClipboard()"]');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        // Track the copy - using prompt.id directly from Jinja
+        fetch(`/prompt/{{ prompt.id }}/copy`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const copyCount = document.querySelector('[data-type="copies"]');
+                if (copyCount) {
+                    copyCount.textContent = data.count;
+                }
+            }
+        });
+
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+        }, 2000);
+    });
+}
+
+function handleFeedback(action) {
+    // Set the action in the hidden form field
+    document.getElementById('feedbackAction').value = action;
+    // Show the comment form
+    document.getElementById('feedbackForm').style.display = 'block';
+}
+
+function hideCommentForm() {
+    document.getElementById('feedbackForm').style.display = 'none';
+}
+
+function toggleComments() {
+    const commentsSection = document.getElementById('commentsSection');
+    commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}
