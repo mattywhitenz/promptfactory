@@ -21,6 +21,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true; // Keep message channel open for async response
   }
+  
+  // Enable/disable iframe header stripping based on overlay usage
+  if (request.action === 'enableIframeBypass') {
+    chrome.declarativeNetRequest.updateEnabledRulesets({
+      enableRulesetIds: ['iframe_rules']
+    }).then(() => {
+      console.log('Iframe bypass rules enabled');
+      sendResponse({ success: true });
+    }).catch((error) => {
+      console.error('Failed to enable iframe bypass rules:', error);
+      sendResponse({ success: false, error: error.message });
+    });
+    return true;
+  }
+  
+  if (request.action === 'disableIframeBypass') {
+    chrome.declarativeNetRequest.updateEnabledRulesets({
+      disableRulesetIds: ['iframe_rules']
+    }).then(() => {
+      console.log('Iframe bypass rules disabled');
+      sendResponse({ success: true });
+    }).catch((error) => {
+      console.error('Failed to disable iframe bypass rules:', error);
+      sendResponse({ success: false, error: error.message });
+    });
+    return true;
+  }
 });
 
 // Optional: Handle tab updates to reset overlay state

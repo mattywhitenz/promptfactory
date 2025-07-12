@@ -92,6 +92,105 @@
       background-color: #fce8e6;
       color: #d93025;
     }
+    
+    .info-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .info-section h3 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #5f6368;
+    }
+    
+    .info-section p {
+      margin: 0 0 8px 0;
+      font-size: 11px;
+      color: #80868b;
+      line-height: 1.4;
+    }
+    
+    .working-sites {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      font-size: 11px;
+      color: #5f6368;
+    }
+    
+    .working-sites li {
+      padding: 4px 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .bypass-controls {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .checkmark {
+      width: 18px;
+      height: 18px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      position: relative;
+      background-color: #fff;
+      transition: background-color 0.2s;
+    }
+
+    .checkbox-label input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkbox-label input:checked ~ .checkmark {
+      background-color: #4285f4;
+      border-color: #4285f4;
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 5px;
+      top: 1px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+
+    .checkbox-label input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .bypass-info {
+      font-size: 11px;
+      color: #80868b;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -101,12 +200,34 @@
       <input type="url" id="websiteUrl" placeholder="https://example.com" />
     </div>
     
+    <div class="bypass-controls">
+      <label class="checkbox-label">
+        <input type="checkbox" id="enableBypass" checked>
+        <span class="checkmark"></span>
+        Enable iframe bypass (experimental)
+      </label>
+      <p class="bypass-info">This removes security headers that prevent websites from loading in frames.</p>
+    </div>
+    
     <div class="button-group">
       <button id="toggleOverlay" class="primary">Toggle Overlay</button>
       <button id="closeOverlay" class="secondary">Close</button>
     </div>
     
     <div id="status" class="status" style="display: none;"></div>
+    
+    <div class="info-section">
+      <h3>💡 Tips</h3>
+      <p>Some websites block embedding for security. Try these that work well:</p>
+      <ul class="working-sites">
+        <li>Wikipedia</li>
+        <li>Reddit</li>
+        <li>GitHub</li>
+        <li>Stack Overflow</li>
+        <li>Archive.org</li>
+        <li>MDN Docs</li>
+      </ul>
+    </div>
   </div>
   
   <script src="popup.js"></script>

@@ -5,7 +5,11 @@
   "description": "Click to display a website as an overlay frame on any webpage",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -25,5 +29,22 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [{
+    "resources": [ 
+      "overlay.html",
+      "overlay.js"
+    ],
+    "matches": ["<all_urls>"],
+    "use_dynamic_url": true
+  }],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "iframe_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
   }
 }

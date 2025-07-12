@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Website Overlay</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      scroll-behavior: auto;
+      overscroll-behavior: contain;
+    }
+    
+    .overlay-header {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-bottom: 1px solid #e0e0e0;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 40px;
+      user-select: none;
+    }
+    
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .overlay-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+    
+    .overlay-minimize,
+    .overlay-close {
+      width: 28px;
+      height: 28px;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    
+    .overlay-minimize {
+      background: #007aff;
+    }
+    
+    .overlay-minimize:hover {
+      background: #0056b3;
+      transform: scale(1.1);
+    }
+    
+    .overlay-close {
+      background: #ff5f56;
+    }
+    
+    .overlay-close:hover {
+      background: #ff3b30;
+      transform: scale(1.1);
+    }
+    
+    .overlay-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .overlay-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scroll-behavior: auto;
+    }
+    
+    .overlay-error {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #f8f9fa;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .error-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .overlay-error h3 {
+      margin: 0 0 12px 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .overlay-error p {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+    
+    .error-url {
+      font-family: monospace;
+      font-size: 12px;
+      background: #e9ecef;
+      padding: 8px 12px;
+      border-radius: 4px;
+      word-break: break-all;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+    
+    .error-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .error-button {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .error-button:hover {
+      background: #0056b3;
+    }
+    
+    .error-button.retry {
+      background: #34c759;
+    }
+    
+    .error-button.retry:hover {
+      background: #28a745;
+    }
+    
+
+    
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay-header">
+    <span class="overlay-title">Loading...</span>
+    <div class="header-buttons">
+      <button class="overlay-minimize" id="minimizeButton">−</button>
+      <button class="overlay-close" id="closeButton">✕</button>
+    </div>
+  </div>
+  
+  <div class="overlay-content">
+    <div class="loading">Loading website...</div>
+    <iframe class="overlay-iframe" id="contentFrame" style="display: none;"></iframe>
+    
+    <div class="overlay-error" id="errorContainer">
+      <div class="error-icon">⚠️</div>
+      <h3>Unable to load this website</h3>
+      <p>This website has security settings that prevent it from being embedded.</p>
+      <p class="error-url" id="errorUrl"></p>
+      <div class="error-buttons">
+        <button class="error-button" id="openTabButton">Open in New Tab</button>
+        <button class="error-button retry" id="retryButton">Try Proxy</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="overlay.js"></script>
+</body>
+</html> 

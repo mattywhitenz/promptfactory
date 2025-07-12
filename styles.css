@@ -1,113 +1,30 @@
-/* Overlay container styles */
-.website-overlay-container {
+/* Simplified overlay container styles - now using inline styles in content.js */
+/* These are kept as backup/fallback styles */
+
+.website-overlay-extension-container {
   position: fixed !important;
-  top: 50px !important;
-  right: 50px !important;
-  width: 400px !important;
-  height: 500px !important;
-  z-index: 2147483647 !important; /* Maximum z-index */
-  background: #ffffff !important;
+  z-index: 2147483647 !important;
+  background: white !important;
   border: 2px solid #e0e0e0 !important;
   border-radius: 12px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2) !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  cursor: grab !important;
   overflow: hidden !important;
-  backdrop-filter: blur(10px) !important;
-  display: flex !important;
-  flex-direction: column !important;
+  display: block !important;
+  visibility: visible !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-.website-overlay-container:active {
-  cursor: grabbing !important;
-}
-
-/* Close button styles */
-.website-overlay-close {
-  position: absolute !important;
-  top: 8px !important;
-  right: 8px !important;
-  width: 28px !important;
-  height: 28px !important;
-  background: #ff5f56 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 50% !important;
-  cursor: pointer !important;
-  font-size: 14px !important;
-  font-weight: bold !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 2147483648 !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-}
-
-.website-overlay-close:hover {
-  background: #ff3b30 !important;
-  transform: scale(1.1) !important;
-}
-
-/* Iframe styles */
-.website-overlay-iframe {
+.website-overlay-extension-iframe {
   width: 100% !important;
   height: 100% !important;
   border: none !important;
-  border-radius: 0 0 10px 10px !important;
   background: white !important;
-  flex: 1 !important;
-}
-
-/* Resize handle styles */
-.website-overlay-resize {
-  position: absolute !important;
-  bottom: 0 !important;
-  right: 0 !important;
-  width: 20px !important;
-  height: 20px !important;
-  background: #007aff !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 10px 0 10px 0 !important;
-  cursor: nw-resize !important;
-  font-size: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 2147483648 !important;
-  transition: all 0.2s ease !important;
-}
-
-.website-overlay-resize:hover {
-  background: #0056b3 !important;
-  transform: scale(1.1) !important;
-}
-
-/* Header area for dragging */
-.website-overlay-container::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 40px !important;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
-  border-radius: 10px 10px 0 0 !important;
-  z-index: 2147483647 !important;
-  border-bottom: 1px solid #e0e0e0 !important;
-}
-
-/* Adjust iframe to account for header */
-.website-overlay-iframe {
-  margin-top: 40px !important;
-  height: calc(100% - 40px) !important;
-  border-radius: 0 0 10px 10px !important;
+  display: block !important;
 }
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
-  .website-overlay-container {
+  .website-overlay-extension-container {
     width: 90vw !important;
     height: 70vh !important;
     top: 15vh !important;
@@ -117,16 +34,10 @@
 }
 
 @media (max-width: 480px) {
-  .website-overlay-container {
+  .website-overlay-extension-container {
     width: 95vw !important;
     height: 80vh !important;
     top: 10vh !important;
     left: 2.5vw !important;
-  }
-  
-  .website-overlay-close {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 16px !important;
   }
 }

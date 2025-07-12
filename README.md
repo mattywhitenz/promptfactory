@@ -5,10 +5,13 @@ A Chrome extension that allows you to display any website as an overlay frame on
 ## Features
 
 - Toggle website overlays on any webpage
-- Customizable overlay URL and opacity
-- Draggable overlay frame
+- **Advanced iframe bypass** - Load sites that normally block embedding (Google, Facebook, etc.)
+- Multiple bypass methods with fallback support
+- Customizable overlay URL and security settings
+- Draggable and resizable overlay frame
 - Persistent settings across browser sessions
-- Clean and modern UI
+- Clean and modern UI with error handling
+- User-controlled security bypass (can be disabled)
 
 ## Installation
 
@@ -60,7 +63,9 @@ promptfactory/
 ├── popup.html          # Extension popup interface
 ├── popup.js           # Popup functionality
 ├── content.js         # Content script injected into web pages
-├── styles.css         # Styles for the overlay
+├── overlay.html        # Extension overlay interface (loaded in iframe)
+├── styles.css         # Fallback styles for the overlay container
+├── rules.json         # declarativeNetRequest rules for header modification
 ├── icons/             # Extension icons
 │   ├── icon.svg       # Source SVG icon
 │   ├── icon16.png     # 16x16 toolbar icon
@@ -70,11 +75,47 @@ promptfactory/
 └── README.md          # This file
 ```
 
+## Security Bypass Methods
+
+This extension uses a **dual-iframe approach** combined with multiple bypass techniques:
+
+### **Architecture Overview**
+1. **Content Script** creates a container iframe that loads the extension's `overlay.html`
+2. **Extension HTML** (`overlay.html`) creates a second iframe that loads the target website
+3. This approach bypasses many restrictions since the extension HTML is trusted
+
+### 1. **declarativeNetRequest API** (Primary Method)
+- Removes `X-Frame-Options` headers
+- Removes `Content-Security-Policy` headers  
+- Chrome-approved method for Manifest V3
+
+### 2. **CORS Proxy Fallback**
+- Routes requests through proxy services
+- Handles sites with extreme restrictions
+- User-triggered fallback option
+
+### 3. **Enhanced Iframe Configuration**
+- Custom sandbox permissions
+- Referrer policy modification
+- Optimized loading attributes
+
+### 4. **Dual-Iframe Isolation**
+- Extension HTML acts as intermediary
+- Reduces security conflicts
+- Better compatibility with restrictive sites
+
+### 5. **User Control**
+- Bypass can be enabled/disabled per user preference
+- Respects user privacy and security choices
+- Clear feedback when sites fail to load
+
 ## Permissions
 
 The extension requires the following permissions:
 - `activeTab`: To inject the overlay into the current tab
 - `storage`: To save user preferences
+- `declarativeNetRequest`: To modify response headers for iframe bypass
+- `host_permissions`: To apply header modifications across all sites
 
 ## Development
 
@@ -87,9 +128,11 @@ The extension requires the following permissions:
 ### Key Files
 
 - **popup.js**: Handles the extension popup logic and user interactions
-- **content.js**: Manages the overlay frame injection and behavior
-- **styles.css**: Contains all styling for the overlay frame
-- **background.js**: Handles extension lifecycle and messaging
+- **content.js**: Manages the overlay container injection and messaging
+- **overlay.html**: Extension's overlay interface with website loading logic
+- **styles.css**: Fallback styles for the overlay container
+- **background.js**: Handles extension lifecycle and declarativeNetRequest rules
+- **rules.json**: Defines header modification rules for iframe bypass
 
 ## Troubleshooting
 
